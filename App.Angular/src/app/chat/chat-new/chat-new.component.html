@@ -1,0 +1,102 @@
+<div class="d-flex justify-content-between align-items-center p-3 border-bottom bg-light">
+  <span class="fw-bold ms-2">Sohbetler</span>
+  <div class="d-flex align-items-center">
+
+    <!-- Logout Button -->
+    <button (click)="logOut()" class="btn btn-outline-danger btn-sm me-2" [disabled]="isLoading">
+      <i class="bi bi-box-arrow-right"></i>
+      <span *ngIf="isLoading">Çıkıyor...</span>
+      <span *ngIf="!isLoading"></span>
+    </button>
+
+
+    <!-- New Message Button -->
+    <button class="btn btn-outline-secondary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#newMessageModal">
+      <i class="bi bi-plus"></i>
+    </button>
+
+    <!-- User Info Button -->
+    <button (click)="getUserInfo()" class="btn btn-outline-info btn-sm me-2" data-bs-toggle="modal" data-bs-target="#userInfoModal">
+      <i class="bi bi-person-circle"></i>
+    </button>
+  </div>
+</div>
+<div class="p-2 border-bottom">
+  <input type="text" class="form-control form-control-sm" placeholder="kişi ara">
+</div>
+
+<!-- Yeni Mesaj Modal -->
+<div class="modal fade" id="newMessageModal" tabindex="-1" aria-labelledby="newMessageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4">
+      <div class="modal-header">
+        <h5 class="modal-title" id="newMessageModalLabel">Yeni Sohbet</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Hata mesajı alanı -->
+        <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+          {{ errorMessage }}
+        </div>
+
+        <form>
+          <div class="mb-3">
+            <label for="userNumber" class="form-label">Kullanıcı Numarası</label>
+            <input
+              type="text"
+              class="form-control"
+              id="userNumber"
+              placeholder="örn: 05319252145"
+              [(ngModel)]="targetNumber"
+              name="targetNumber"
+            >
+          </div>
+          <div class="mb-3">
+            <label for="messageContent" class="form-label">Mesaj</label>
+            <textarea
+              class="form-control"
+              id="messageContent"
+              rows="3"
+              placeholder="Merhaba!"
+              [(ngModel)]="messageContent"
+              name="messageContent"
+            ></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-bs-dismiss="modal"
+          #closeModalButton
+          style="display: none"
+        >Kapat</button>
+
+        <button type="button" class="btn btn-primary" (click)="newMessage()">Gönder</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Kullanıcı Bilgileri Modal -->
+<div class="modal fade" id="userInfoModal" tabindex="-1" aria-labelledby="userInfoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4">
+      <div class="modal-header">
+        <h5 class="modal-title" id="userInfoModalLabel">Bilgilerim</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Email:</strong> {{showUser.email}}</p>
+        <p><strong>Kullanıcı adı:</strong> {{showUser.userName}}</p>
+        <p><strong>Numara:</strong> {{showUser.phoneNumber}}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+      </div>
+    </div>
+  </div>
+</div>

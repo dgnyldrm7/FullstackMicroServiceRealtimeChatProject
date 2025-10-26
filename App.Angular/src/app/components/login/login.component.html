@@ -1,0 +1,109 @@
+<div class="container d-flex align-items-center justify-content-center min-vh-100">
+  <div class="card shadow p-4" style="width: 100%; max-width: 400px; border-radius: 1rem;">
+    <h3 class="text-center mb-4">ChatApp</h3>
+
+    <!-- Giriş Formu -->
+    <form *ngIf="!isRegistering" (ngSubmit)="LoginMethod()">
+      <!-- Hata mesajı -->
+      <div *ngIf="isSuccess" class="alert alert-danger" role="alert">
+        Hatalı giriş yaptınız.
+      </div>
+      <div class="mb-3">
+        <label for="phoneNumber" class="form-label">Numara</label>
+        <input type="text" class="form-control" id="phoneNumber" placeholder="0533 333 33 33"
+               [(ngModel)]="phoneNumber" name="phoneNumber">
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Şifre</label>
+        <input type="password" class="form-control" id="password" placeholder="Şifreniz"
+               [(ngModel)]="password" name="password">
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100" [disabled]="isLoading">
+        <ng-container *ngIf="!isLoading; else loading">
+          Giriş Yap
+        </ng-container>
+        <ng-template #loading>
+          <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          Yükleniyor...
+        </ng-template>
+      </button>
+    </form>
+
+    <!-- Kayıt Formu -->
+    <form *ngIf="isRegistering" (ngSubmit)="RegisterMethod()">
+
+      <div *ngIf="successMessage" class="alert alert-success" role="alert">
+        {{ successMessage }}
+      </div>
+
+      <div *ngIf="!isLoading && errorMessage" class="alert alert-danger" role="alert">
+        {{ errorMessage }}
+      </div>
+
+      <div class="mb-3">
+        <label for="userName" class="form-label">Kullanıcı Adı</label>
+        <input type="text" class="form-control" id="userName" placeholder="Adınız" [(ngModel)]="userName" name="userName">
+        <div *ngIf="validationErrors['UserName']" class="text-danger small mt-1">
+          <div *ngFor="let err of validationErrors['UserName']">
+            {{ err }}
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="email" class="form-label">E-posta</label>
+        <input type="email" class="form-control" id="email" placeholder="E-posta" [(ngModel)]="email" name="email">
+        <div *ngIf="validationErrors['Email']" class="text-danger small mt-1">
+          <div *ngFor="let err of validationErrors['Email']">
+            {{ err }}
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="phoneNumber" class="form-label">Telefon</label>
+        <input type="text" class="form-control" id="phoneNumber" placeholder="0533 333 33 33" [(ngModel)]="phoneNumber" name="phoneNumber">
+        <div *ngIf="validationErrors['PhoneNumber']" class="text-danger small mt-1">
+          <div *ngFor="let err of validationErrors['PhoneNumber']">
+            {{ err }}
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Şifre</label>
+        <input type="password" class="form-control" id="password" placeholder="Şifreniz" [(ngModel)]="password" name="password">
+        <div *ngIf="validationErrors['Password']" class="text-danger small mt-1">
+          <div *ngFor="let err of validationErrors['Password']">
+            {{ err }}
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-success w-100" [disabled]="isLoading">
+        <ng-container *ngIf="!isLoading; else loading">
+          Kayıt Ol
+        </ng-container>
+        <ng-template #loading>
+          <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          Yükleniyor...
+        </ng-template>
+      </button>
+    </form>
+
+    <div class="mt-4 text-center">
+      <small>
+        <a href="#" (click)="toggleForm($event)" class="text-decoration-none">
+          {{ isRegistering ? 'Zaten hesabınız var mı? Giriş yap' : 'Hesabınız yok mu? Kayıt ol' }}
+        </a>
+      </small>
+    </div>
+  </div>
+</div>
+
+<!-- Powered By Doğan Yıldırım -->
+<div *ngIf="!isRegistering" class="position-fixed bottom-0 start-50 translate-middle-x text-center mb-3">
+  <small>Powered by Doğan Yıldırım</small>
+</div>

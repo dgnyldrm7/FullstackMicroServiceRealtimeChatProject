@@ -1,0 +1,41 @@
+<div class="list-group list-group-flush custom-scrollbar overflow-y-auto" style="max-height: 500px;">
+
+
+
+  <div *ngIf="isLoading" class="d-flex justify-content-center align-items-center position-absolute top-50 start-50 translate-middle w-100 h-100 bg-white bg-opacity-75">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Yükleniyor...</span>
+    </div>
+  </div>
+
+  @for (friend of friends; track friend) {
+    <button
+      class="list-group-item list-group-item-action border-0 my-2 d-flex align-items-center px-2 py-2"
+      (click)="sendDataToParent(friend.phoneNumber)"
+      style="width: 100%; min-width: 280px; max-width: 100%;"
+    >
+      <img src="userProfileImage.jpeg" class="rounded-circle me-3 userProfile" width="40" height="40" />
+
+      <!-- Sağ iç kısım -->
+      <div class="d-flex justify-content-between align-items-center w-100 overflow-hidden">
+        <!-- Telefon ve mesaj -->
+        <div class="me-2" style="min-width: 0;">
+          <div class="fw-bold small text-truncate">{{ friend.userName }}</div>
+          <div class="text-muted small text-truncate">
+            {{ friend.lastMessage.length > 35 ? (friend.lastMessage | slice:0:35) + '...' : friend.lastMessage }}
+          </div>
+        </div>
+        <!-- Saat -->
+        <div class="text-muted small ms-2 text-nowrap">
+          {{ friend.lastMessageSentAt | date:'HH:mm' }}
+        </div>
+      </div>
+    </button>
+  }
+
+  <div *ngIf="!isLoading && friends.length === 0" class="h-100 d-flex justify-content-center align-items-center text-center">
+    <div class="text-muted">
+      <p>Sohbet listeniz henüz boş.</p>
+    </div>
+  </div>
+</div>

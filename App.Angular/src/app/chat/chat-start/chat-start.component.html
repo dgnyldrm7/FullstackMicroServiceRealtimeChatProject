@@ -1,0 +1,51 @@
+<div class="h-100 d-flex flex-column mx-auto" style="background-color: #f0f2f5; width: 100%; max-width: 780px;">
+
+  <!-- ÜST BAR: Kullanıcı bilgileri -->
+  <div class="d-flex align-items-center p-2 bg-white shadow-sm border-bottom">
+    <img src="userProfileImage.jpeg" class="rounded-circle me-2" alt="User Image" width="40" height="40" />
+    <div>
+      <div class="fw-semibold">{{ senderName }}</div>
+      <small class="text-muted">{{ aliciNumara }}</small>
+    </div>
+  </div>
+
+  <!-- MESAJLAR -->
+  <div #chatContainer class="flex-grow-1 overflow-auto px-3 py-2 d-flex flex-column">
+    @for (data of conversationData; track data) {
+
+      @if (data.senderNumber !== aliciNumara) {
+        <!-- Benim mesajım (sağda) -->
+        <div class="d-flex justify-content-end mb-2">
+          <div class="p-2 rounded-3 bg-success text-white shadow-sm"
+               style="max-width: 75%; word-break: break-word; overflow-wrap: break-word; white-space: pre-wrap;">
+            <small>{{ data.content }}</small><br />
+            <small class="text-light">{{ data.sentAt | date:'HH:mm' }}</small>
+          </div>
+        </div>
+      }
+
+      @if (data.senderNumber === aliciNumara) {
+        <!-- Diğer kişinin mesajı (solda) -->
+        <div class="d-flex justify-content-start mb-2">
+          <div class="p-2 rounded-3 shadow-sm"
+               style="max-width: 75%; background-color: #f1f0f0; word-break: break-word; white-space: pre-wrap;">
+            <small class="text-dark">{{ data.content }}</small><br />
+            <small class="text-muted">{{ data.sentAt | date:'HH:mm' }}</small>
+          </div>
+        </div>
+      }
+
+    }
+  </div>
+
+  <!-- ALT BAR: Mesaj gönderme -->
+  <div class="p-2 border-top bg-white d-flex align-items-center">
+    <input type="text" [(ngModel)]="userInputMessage"
+           (keydown.enter)="sendMessage()"
+           class="form-control me-2 rounded-pill"
+           placeholder="Mesajınızı yazın..." />
+    <button class="btn btn-primary rounded-circle" (click)="sendMessage()">
+      <i class="bi bi-send-fill"></i>
+    </button>
+  </div>
+</div>

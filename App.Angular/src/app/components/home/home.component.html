@@ -1,0 +1,33 @@
+<div class="vh-100 d-flex flex-column justify-content-center align-items-center">
+  <!-- Ana chat kutusu -->
+  <div class="d-flex border rounded-4 overflow-hidden shadow-lg" style="width: 90%; max-width: 1200px; height: 90vh;">
+    <div class="border-end bg-white" style="width: 35%;">
+      <app-chat-new></app-chat-new>
+      <app-chat-list-box
+        (friendNumber)="handleFriendNumber($event)"
+        (senderSelected)="handleSenderUserId($event)"
+        (senderSelected)="handleFriendNumber($event)"
+        (_friendName)="handleFriendName($event)"
+        (friendNameSelected)="handleFriendName($event)">
+      </app-chat-list-box>
+    </div>
+    <div class="bg-white flex-grow-1">
+      <app-chat-box *ngIf="!isSelected"></app-chat-box>
+      <app-chat-start
+        *ngIf="isSelected"
+        [conversationData]="selectedConversationData"
+        [currentUserId]="currentUserId"
+        [senderNumber]="messageContext.friendNumber"
+        [aliciNumara]="messageContext.friendNumber"
+        [aliciUserId]="messageContext.receiverId"
+        [benimnumaram]="messageContext.friendNumber"
+        [senderName]="friendName">
+      </app-chat-start>
+    </div>
+  </div>
+
+  <!-- Alt yazı -->
+  <div class="mt-2 text-center" style="opacity: 0.6;">
+    <small class="text-muted">Powered by Doğan Yıldırım</small>
+  </div>
+</div>
