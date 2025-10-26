@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "9VEXk3SMYc0=",
+  "dgSpecHash": "FVeCPr1D4YI=",
   "success": true,
-  "projectFilePath": "E:\\ONEMLIDOSYALAR\\ConsumerService\\RealtimeChatApp.ConsumerService\\RealtimeChatApp.ConsumerService\\RealtimeChatApp.ConsumerService.csproj",
+  "projectFilePath": "E:\\ONEMLIDOSYALAR\\FullstackMicroServiceRealtimeChatProject\\App.WorkerService\\RealtimeChatApp.ConsumerService\\RealtimeChatApp.ConsumerService.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\doganboy\\.nuget\\packages\\azure.core\\1.47.1\\azure.core.1.47.1.nupkg.sha512",
     "C:\\Users\\doganboy\\.nuget\\packages\\azure.identity\\1.14.2\\azure.identity.1.14.2.nupkg.sha512",

@@ -2,8 +2,11 @@
 using App.Core.Entities;
 using App.Core.Interface;
 using App.Core.Result;
+using App.Infrastructure.Cache;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace App.Logic.Services
 {
@@ -12,15 +15,27 @@ namespace App.Logic.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<AppUser> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
+        private readonly ICurrentUserService currentUserService;
+        private readonly MemoryCacheService memoryCacheService;
+        private readonly ILogger<UserService> logger;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
         public UserService(
             UserManager<AppUser> userManager,
             IUnitOfWork unitOfWork,
-            RoleManager<IdentityRole> roleManager)
+            RoleManager<IdentityRole> roleManager,
+            ICurrentUserService currentUserService,
+            MemoryCacheService memoryCacheService,
+            ILogger<UserService> logger,
+            IHttpContextAccessor httpContextAccessor)
         {
             this.userManager = userManager;
             _unitOfWork = unitOfWork;
             this.roleManager = roleManager;
+            this.currentUserService = currentUserService;
+            this.memoryCacheService = memoryCacheService;
+            this.logger = logger;
+            this.httpContextAccessor = httpContextAccessor;
         }
 
         /// <summary>
@@ -54,6 +69,9 @@ namespace App.Logic.Services
 
             if (hasUser != null && hasUserByEmail != null)
             {
+
+                logger.LogInformation("User registration failed: User with the same phone number or email already exists.");
+
                 return Result<IdentityResult>.Failure("User already exists, the same number or mail cannot be used.", 409);
             }
 
@@ -90,6 +108,8 @@ namespace App.Logic.Services
 
             // Kullanıcıya "User" rolünü ata
             await userManager.AddToRoleAsync(newUser, "User");
+
+            logger.LogInformation("New user registered successfully with phone number: {PhoneNumber}", newUser.PhoneNumber);
 
             return Result<IdentityResult>.Success(result, 201);
         }
@@ -140,6 +160,53 @@ namespace App.Logic.Services
 
             return Result<UserDto>.Success(resultUserDto, 200);
         }
+
+
+        /// <summary>
+        ///     User'ın Direkt Kendisini Çekme İşlemidir.
+        /// </summary>
+        public async Task<Result<UserDto>> GetMeAsync()
+        {
+            AppUser? loggedInUser = await currentUserService.GetLoggedInUserAsync();
+
+            if (loggedInUser is null)
+            {
+                return Result<UserDto>.Failure("User not found", 404);
+            }
+
+            string key = loggedInUser.PhoneNumber!;
+
+            UserDto? data = memoryCacheService.Get<UserDto>(key);
+
+            if (data is not null)
+            {
+                return Result<UserDto>.Success(data, 200);
+            }
+
+            UserDto resultUserDto = new UserDto
+            {
+                Id = loggedInUser.Id,
+                Email = loggedInUser.Email,
+                UserName = loggedInUser.UserName,
+                PhoneNumber = loggedInUser.PhoneNumber
+            };
+
+            memoryCacheService.Set(key, resultUserDto, TimeSpan.FromMinutes(5));
+
+            var ipAddress = httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString();
+
+            if (!string.IsNullOrEmpty(ipAddress))
+            {
+                logger.LogWarning("User IP address: {ipAddress}", ipAddress);
+            }
+            else
+            {
+                logger.LogWarning("IP address could not be retrieved.");
+            }
+
+            return Result<UserDto>.Success(resultUserDto, 200);
+        }
+
 
         /// <summary>
         ///   User'ın Emailine göre bulur.

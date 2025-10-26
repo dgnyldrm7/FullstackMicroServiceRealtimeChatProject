@@ -51,5 +51,12 @@ namespace App.Persistance.Repositories
                 _context.Messages.Remove(message);
             }
         }
+
+        public IQueryable<Message> Query()
+        {
+            return _context.Messages
+                .Include(m => m.Sender)
+                .Include(m => m.Receiver);
+        }
     }
 }

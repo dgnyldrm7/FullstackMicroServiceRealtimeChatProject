@@ -30,6 +30,17 @@ namespace App.API.Controllers
         }
 
         [Authorize]
+        [HttpGet("me")]
+        [ProducesResponseType(typeof(Result<UserDto>), 200)]
+        [ProducesResponseType(typeof(Result<UserDto>), 404)]
+        public async Task<IActionResult> GetMe()
+        {
+            Result<UserDto> result = await userService.GetMeAsync();
+
+            return StatusCode(result.StatusCode, result);
+        }
+
+        [Authorize]
         [HttpGet("by-number/{userNumber}")]
         [ProducesResponseType(typeof(Result<UserDto>), 200)]
         [ProducesResponseType(typeof(Result<UserDto>), 404)]

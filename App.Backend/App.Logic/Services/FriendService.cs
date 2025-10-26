@@ -56,7 +56,7 @@ namespace App.Logic.Services
             var friendDtos = friends.Select(friend =>
             {
                 var lastMessage = messages
-                    .Where(m =>(m.SenderId == InUser.Id && m.ReceiverId == friend!.Id) || (m.SenderId == friend!.Id && m.ReceiverId == InUser.Id))
+                    .Where(m => (m.SenderId == InUser.Id && m.ReceiverId == friend!.Id) || (m.SenderId == friend!.Id && m.ReceiverId == InUser.Id))
                     .OrderByDescending(m => m.SentAt)
                     .FirstOrDefault();
 

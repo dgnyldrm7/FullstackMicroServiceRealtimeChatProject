@@ -1,9 +1,9 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "E:\\ONEMLIDOSYALAR\\ConsumerService\\RealtimeChatApp.ConsumerService\\",
+  "WorkspaceRootPath": "E:\\ONEMLIDOSYALAR\\FullstackMicroServiceRealtimeChatProject\\App.WorkerService\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{7B9DFA83-F649-4F73-88EB-E0DDB0F7F9FD}|RealtimeChatApp.ConsumerService\\RealtimeChatApp.ConsumerService.csproj|e:\\onemlidosyalar\\consumerservice\\realtimechatapp.consumerservice\\realtimechatapp.consumerservice\\rabbitmq\\consumerrabbitmq.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{7B9DFA83-F649-4F73-88EB-E0DDB0F7F9FD}|RealtimeChatApp.ConsumerService\\RealtimeChatApp.ConsumerService.csproj|e:\\onemlidosyalar\\fullstackmicroservicerealtimechatproject\\app.workerservice\\realtimechatapp.consumerservice\\rabbitmq\\consumerrabbitmq.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{7B9DFA83-F649-4F73-88EB-E0DDB0F7F9FD}|RealtimeChatApp.ConsumerService\\RealtimeChatApp.ConsumerService.csproj|solutionrelative:realtimechatapp.consumerservice\\rabbitmq\\consumerrabbitmq.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
@@ -32,11 +32,11 @@
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "ConsumerRabbitMQ.cs",
-              "DocumentMoniker": "E:\\ONEMLIDOSYALAR\\ConsumerService\\RealtimeChatApp.ConsumerService\\RealtimeChatApp.ConsumerService\\RabbitMQ\\ConsumerRabbitMQ.cs",
+              "DocumentMoniker": "E:\\ONEMLIDOSYALAR\\FullstackMicroServiceRealtimeChatProject\\App.WorkerService\\RealtimeChatApp.ConsumerService\\RabbitMQ\\ConsumerRabbitMQ.cs",
               "RelativeDocumentMoniker": "RealtimeChatApp.ConsumerService\\RabbitMQ\\ConsumerRabbitMQ.cs",
-              "ToolTip": "E:\\ONEMLIDOSYALAR\\ConsumerService\\RealtimeChatApp.ConsumerService\\RealtimeChatApp.ConsumerService\\RabbitMQ\\ConsumerRabbitMQ.cs",
+              "ToolTip": "E:\\ONEMLIDOSYALAR\\FullstackMicroServiceRealtimeChatProject\\App.WorkerService\\RealtimeChatApp.ConsumerService\\RabbitMQ\\ConsumerRabbitMQ.cs",
               "RelativeToolTip": "RealtimeChatApp.ConsumerService\\RabbitMQ\\ConsumerRabbitMQ.cs",
-              "ViewState": "AgIAAAoAAAAAAAAAAAA3wCEAAABDAAAAAAAAAA==",
+              "ViewState": "AgIAAB4AAAAAAAAAAAAwwCEAAABDAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-10-26T13:33:04.361Z",
               "EditorCaption": ""

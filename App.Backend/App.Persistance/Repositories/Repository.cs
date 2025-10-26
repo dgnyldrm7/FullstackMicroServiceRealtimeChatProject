@@ -41,5 +41,7 @@ namespace App.Persistance.Repositories
                 _context.Set<T>().Remove(entity);
             }
         }
+
+        public IQueryable<T> Query() => _context.Set<T>();
     }
 }

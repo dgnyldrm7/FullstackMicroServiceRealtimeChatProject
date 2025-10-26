@@ -1,36 +1,30 @@
 ﻿using App.Core.DTOs;
 using App.Core.Entities;
 using App.Core.Interface;
+using App.Core.Interface.RabbitMQ;
 using App.Core.Result;
 using App.Logic.HubContext;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace App.Logic.Services
 {
     public class MessageService : IMessageService
     {
         private readonly UserManager<AppUser> _userManager;
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IRepository<Message> repository;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ICurrentUserService currentUser;
-        private readonly ILogger<MessageService> _logger;
-
-        public MessageService(UserManager<AppUser> userManager, IUnitOfWork unitOfWork, IRepository<Message> repository, IHttpContextAccessor httpContextAccessor, ILogger<MessageService> logger, IHubContext<WorkerHub> hubContext, ICurrentUserService currentUser)
+        private readonly IRabbitMQPublisher rabbitMQPublisher;
+        private readonly IHubContext<WorkerHub, IWorkerHub> _hubContext;
+        public MessageService(UserManager<AppUser> userManager, ICurrentUserService currentUser, IRabbitMQPublisher rabbitMQPublisher, IHubContext<WorkerHub, IWorkerHub> hubContext)
         {
             _userManager = userManager;
-            _unitOfWork = unitOfWork;
-            this.repository = repository;
-            _httpContextAccessor = httpContextAccessor;
-            _logger = logger;
             this.currentUser = currentUser;
+            this.rabbitMQPublisher = rabbitMQPublisher;
+            _hubContext = hubContext;
         }
 
-        public async Task<Result<MessageDto>> SendMessageAsync(SendMessageDto dto)
+        public async Task<Result<MessageDto>> SendMessageAsync(ChatMessageDto dto)
         {
             AppUser? loggedInUser = await currentUser.GetLoggedInUserAsync();
 
@@ -47,34 +41,43 @@ namespace App.Logic.Services
             }
                 
             AppUser? receiver = await _userManager.Users
-                .FirstOrDefaultAsync(x => x.PhoneNumber == dto.ReceiverUserNumber);
+                .FirstOrDefaultAsync(x => x.PhoneNumber == dto.ReceiverNumber);
 
             if (receiver == null)
             {
                 return Result<MessageDto>.Failure("Receiver not found", 404);
             }
 
-            _logger.LogWarning($"receiver phone number: {receiver?.PhoneNumber}");
-
-            Message messageData = new Message
+            var message = new Message
             {
                 SenderId = sender.Id,
-                ReceiverId = receiver?.Id,
+                ReceiverId = receiver.Id,
                 Content = dto.Content,
-                SentAt = DateTime.UtcNow.AddHours(3) //For turkey hours!
+                SentAt = DateTime.UtcNow
             };
 
-            await repository.AddAsync(messageData);
-
-            await _unitOfWork.SaveChangesAsync(CancellationToken.None);
-
-            return Result<MessageDto>.Success(new MessageDto
+            await rabbitMQPublisher.Publish(
+            new MessageDtoForRabbitMQ
             {
-                Message = messageData.Content,
-                SentAt = messageData.SentAt,
+                SenderId = sender.Id,
+                SenderNumber = sender.PhoneNumber,
+                ReceiverId = receiver.Id,
+                ReceiverNumber = receiver.PhoneNumber,
+                Content = dto.Content,
+                SentAt = message.SentAt
+            });
+
+            var messageDto = new MessageDto
+            {
+                Message = dto.Content,
+                SentAt = DateTime.UtcNow,
                 SenderPhoneNumber = sender.PhoneNumber,
-                ReceiverPhoneNumber = receiver?.PhoneNumber
-            }, 200);
+                ReceiverPhoneNumber = receiver.PhoneNumber
+            };
+
+            return Result<MessageDto>.Success(messageDto, 200);
         }
+
+        
     }
 }

@@ -5,6 +5,7 @@ using System.Text;
 using App.Core.Entities;
 using App.Core.Interface;
 using App.Core.Jwt;
+using App.Core.Options;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;

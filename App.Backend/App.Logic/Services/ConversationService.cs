@@ -12,14 +12,12 @@ namespace App.Logic.Services
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly IRepository<Message> repository;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ICurrentUserService currentUser;
 
-        public ConversationService(UserManager<AppUser> userManager, IRepository<Message> repository, IHttpContextAccessor httpContextAccessor, ICurrentUserService currentUser)
+        public ConversationService(UserManager<AppUser> userManager, IRepository<Message> repository, ICurrentUserService currentUser)
         {
             _userManager = userManager;
             this.repository = repository;
-            _httpContextAccessor = httpContextAccessor;
             this.currentUser = currentUser;
         }
 
@@ -46,11 +44,15 @@ namespace App.Logic.Services
             {
                 return Result<List<MessageBoxDto>>.Failure("User or users not found", 404);
             }
-                
-            List<Message> messages = (await repository.GetAllAsync())
-                .Where(m => (m.SenderId == inUser.Id && m.ReceiverId == targetUser.Id) || (m.SenderId == targetUser.Id && m.ReceiverId == inUser.Id))
+
+            var messages = await repository.Query()
+                .Where(m =>
+                    (m.SenderId == inUser.Id && m.ReceiverId == targetUser.Id) ||
+                    (m.SenderId == targetUser.Id && m.ReceiverId == inUser.Id))
+                .Include(m => m.Sender)
+                .Include(m => m.Receiver)
                 .OrderBy(m => m.SentAt)
-                .ToList();
+                .ToListAsync();
 
             var conversationDtos = messages.Select(m => new MessageBoxDto
             {
@@ -58,10 +60,40 @@ namespace App.Logic.Services
                 Content = m.Content,
                 SentAt = m.SentAt,
                 SenderId = m.SenderId,
-                ReceiverId = m.ReceiverId
+                SenderNumber = m.Sender?.PhoneNumber,
+                ReceiverId = m.ReceiverId,
+                ReceiverNumber = m.Receiver?.PhoneNumber
             }).ToList();
-        
+
             return Result<List<MessageBoxDto>>.Success(conversationDtos, 200);
         }
+
+        public async Task<Result<List<MessageBoxDto>>> GetAllConversationsAsync()
+        {
+            AppUser? loggedInUser = await currentUser.GetLoggedInUserAsync();
+
+            if (loggedInUser == null) return Result<List<MessageBoxDto>>.Failure("User is not authenticated.", 401);
+
+            var messages = await repository.Query()
+                .Where(m => m.SenderId == loggedInUser.Id || m.ReceiverId == loggedInUser.Id)
+                .Include(m => m.Sender)
+                .Include(m => m.Receiver)
+                .OrderBy(m => m.SentAt)
+                .ToListAsync();
+
+            var dtos = messages.Select(m => new MessageBoxDto
+            {
+                Id = m.Id,
+                SenderNumber = m.Sender?.PhoneNumber,
+                ReceiverNumber = m.Receiver?.PhoneNumber,
+                Content = m.Content,
+                SentAt = m.SentAt,
+                ReceiverId = m.ReceiverId,
+                SenderId = m.SenderId
+            }).ToList();
+
+            return Result<List<MessageBoxDto>>.Success(dtos, 200);
+        }
+
     }
 }

@@ -18,6 +18,14 @@ namespace App.API.Middlewares
         {
             var path = context.Request.Path.Value;
 
+            if (path.StartsWith("/workerhub", StringComparison.OrdinalIgnoreCase) ||
+                path.StartsWith("/apiworker", StringComparison.OrdinalIgnoreCase))
+            {
+                await _next(context);
+                return;
+            }
+
+
             if (IsPathExcluded(context))
             {
                 await _next(context);
@@ -35,6 +43,14 @@ namespace App.API.Middlewares
             if (!context.User.Identity?.IsAuthenticated ?? true)
             {
                 await RespondUnauthorizedAsync(context, "Authentication token is invalid or expired.");
+                return;
+            }
+
+            // 🔹 Eğer WorkerService ise Redis kontrolü yapılmaz
+            var role = context.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            if (role == "SystemWorker")
+            {
+                await _next(context);
                 return;
             }
 
@@ -74,6 +90,8 @@ namespace App.API.Middlewares
                    path.StartsWith("/api/auth/refresh-token", StringComparison.OrdinalIgnoreCase) ||
                    path.StartsWith("/api/auth/logout", StringComparison.OrdinalIgnoreCase) ||
                    path.StartsWith("/api/chat/send-all-client", StringComparison.OrdinalIgnoreCase) ||
+                   path.StartsWith("/health", StringComparison.OrdinalIgnoreCase) ||
+                   path.StartsWith("/health-ui", StringComparison.OrdinalIgnoreCase) ||
                    (path.StartsWith("/api/users", StringComparison.OrdinalIgnoreCase) && method.Equals("POST", StringComparison.OrdinalIgnoreCase));
         }
 

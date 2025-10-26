@@ -24,61 +24,54 @@ export class ChatListBoxComponent implements OnInit, OnDestroy {
     private getUserService: GetuserService
   ) {}
 
-  //Child component'tan parent component'a veri göndermek için EventEmitter kullanıyoruz
+  // Parent’a veri gönderim emitterları
   @Output() friendNumber = new EventEmitter<string>();
-
   @Output() senderSelected = new EventEmitter<string>();
-
   @Input() friendName: string;
-
   @Output() _friendName = new EventEmitter<string>();
-
   @Output() friendNameSelected = new EventEmitter<string>();
 
   _friendNameSelected: string;
-
   isLoading: boolean = true;
   initialLoadCompleted: boolean = false;
 
+  ngOnInit(): void {
+    this.loadFriends();
 
+    // 🔹 SignalR bağlantısı kurulduğunda liste güncelleme event’ini dinle
+    const interval = setInterval(() => {
+      if (this.hubService.isConnected) {
+        console.log('✅ Hub bağlantısı hazır, event dinleniyor...');
+        this.subscription.add(
+          this.hubService.listenMessageListUpdate().subscribe(() => {
+            console.log('📡 Chat listesi güncellendi.');
+            this.loadFriends();
+          })
+        );
+        clearInterval(interval);
+      }
+    }, 500);
+  }
 
-  sendDataToParent(friendNumber: string)
-  {
+  sendDataToParent(friendNumber: string) {
     this.friendNumber.emit(friendNumber);
     this.getUserInfo(friendNumber);
   }
 
-  getUserInfo(frindNumber : string)
-  {
-    const sub = this.getUserService.getUserByNumber(frindNumber).subscribe({
+  getUserInfo(friendNumber: string) {
+    const sub = this.getUserService.getUserByNumber(friendNumber).subscribe({
       next: (user) => {
         this._friendNameSelected = user.data.userName;
         this.friendNameSelected.emit(this._friendNameSelected);
       },
       error: (error) => {
-        console.error('Arkadaşlar alınırken hata oluştu:', error);
+        console.error('Arkadaş bilgisi alınırken hata oluştu:', error);
       }
     });
     this.subscription.add(sub);
   }
 
-  ngOnInit(): void {
-    this.loadFriends();
-
-    // Hub bağlantısının hazır olmasını bekleyip sonra event'i dinle
-    const waitForConnection = setInterval(() => {
-      if (this.hubService.startConnection) {
-        this.hubService.listenMessageListUpdate((receiverNumber: string) => {
-          this.loadFriends();
-        });
-        clearInterval(waitForConnection);
-      }
-    }, 500);
-  }
-
-
   loadFriends() {
-    // Sadece ilk kez yüklenirken loading göster
     if (!this.initialLoadCompleted) {
       this.isLoading = true;
     }
@@ -106,9 +99,7 @@ export class ChatListBoxComponent implements OnInit, OnDestroy {
     this.subscription.add(sub);
   }
 
-
-
   ngOnDestroy(): void {
-    this.subscription.unsubscribe(); // bellek sızıntısı önlenir
+    this.subscription.unsubscribe();
   }
 }

@@ -1,4 +1,5 @@
-﻿using App.Core.DTOs;
+﻿using System.Collections.Generic;
+using App.Core.DTOs;
 using App.Core.Jwt;
 using App.Core.Result;
 using App.Logic.Services;
@@ -27,25 +28,44 @@ namespace App.API.Controllers
             return StatusCode(result.StatusCode, result);
         }
 
-        [HttpPost("refresh-token")]
+        [HttpPost("mobile/refresh-token")]
         [ProducesResponseType(typeof(Result<ResultTokenMessage>), 200)]
         [ProducesResponseType(typeof(Result<ResultTokenMessage>), 401)]
-        public async Task<IActionResult> RefreshToken(RefreshTokenDto model)
+        public async Task<IActionResult> RefreshTokenMobile(RefreshTokenDto model)
         {
             var result = await tokenService.RefreshToken(model);
 
             return StatusCode(result.StatusCode, result);
         }
 
-        
-        [HttpPost("logout")]
+        [HttpPost("web/refresh-token")]
         [ProducesResponseType(typeof(Result<ResultTokenMessage>), 200)]
         [ProducesResponseType(typeof(Result<ResultTokenMessage>), 401)]
-        public async Task<IActionResult> Logout(LogoutDto model)
+        public async Task<IActionResult> RefreshTokenWeb(RefreshTokenDto model)
         {
-            var result = await tokenService.Logout(model);
+            var result = await tokenService.RefreshToken(model);
 
             return StatusCode(result.StatusCode, result);
-        }        
+        }
+
+        [HttpPost("mobile/logout")]
+        [ProducesResponseType(typeof(Result<ResultTokenMessage>), 200)]
+        [ProducesResponseType(typeof(Result<ResultTokenMessage>), 401)]
+        public async Task<IActionResult> LogoutMobile(LogoutDto model, bool isWeb = false)
+        {
+            var result = await tokenService.LogoutInternal(model.UserNumber, isWeb, model.RefreshToken);
+
+            return StatusCode(result.StatusCode, result);
+        }
+
+        [HttpPost("web/logout")]
+        [ProducesResponseType(typeof(Result<ResultTokenMessage>), 200)]
+        [ProducesResponseType(typeof(Result<ResultTokenMessage>), 401)]
+        public async Task<IActionResult> LogoutWeb()
+        {
+            var result = await tokenService.LogoutInternal(isWeb: true);
+
+            return StatusCode(result.StatusCode, result);
+        }
     }
 }

@@ -7,7 +7,7 @@ import { GenericService } from './generic.service';
 })
 export class ConversationService {
 
-  readonly endPoint : string = "chat/conversations";
+  readonly endPoint : string = "chat/target-conversation";
 
   constructor(private genericService : GenericService) { }
 

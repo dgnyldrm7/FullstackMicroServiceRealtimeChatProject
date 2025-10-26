@@ -7,5 +7,6 @@
         Task AddAsync(T entity);
         void Update(T entity);
         Task DeleteAsync(int id);
+        IQueryable<T> Query();
     }
 }

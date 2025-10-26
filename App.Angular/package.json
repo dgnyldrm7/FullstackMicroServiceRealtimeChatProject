@@ -17,6 +17,8 @@
     "@angular/platform-browser": "^19.2.0",
     "@angular/platform-browser-dynamic": "^19.2.0",
     "@angular/router": "^19.2.0",
+    "@ctrl/ngx-emoji-mart": "^9.3.0",
+    "@emoji-mart/data": "^1.2.1",
     "@microsoft/signalr": "^8.0.7",
     "@popperjs/core": "^2.11.8",
     "bootstrap": "^5.3.5",

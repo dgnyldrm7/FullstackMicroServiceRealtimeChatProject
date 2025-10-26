@@ -9,7 +9,7 @@ namespace App.Logic.Validators
         {
             RuleFor(x => x.RefreshToken)
                 .NotEmpty().WithMessage("Refresh token is required.")
-                .Length(43, 44).WithMessage("Refresh token must be valid and between 43 to 44 characters long.");
+                .WithMessage("Refresh token must be valid.");
 
             RuleFor(x => x.UserNumber)
                 .NotEmpty().WithMessage("User number is required.")

@@ -1,5 +1,5 @@
 ﻿using App.Core.Interface;
-using App.Core.Jwt;
+using App.Core.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -13,7 +13,10 @@ namespace App.Logic.BackgroundJobs
         private readonly JwtSettings jwtSettings;
         private readonly IServiceScopeFactory _scopeFactory;
 
-        public ExpiredRefreshTokenCleanerService(IOptions<JwtSettings> jwtOptions, ILogger<ExpiredRefreshTokenCleanerService> logger, IServiceScopeFactory scopeFactory)
+        public ExpiredRefreshTokenCleanerService(
+            IOptions<JwtSettings> jwtOptions, 
+            ILogger<ExpiredRefreshTokenCleanerService> logger, 
+            IServiceScopeFactory scopeFactory)
         {
             _logger = logger;
             jwtSettings = jwtOptions.Value;

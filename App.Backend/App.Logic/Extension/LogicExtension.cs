@@ -1,4 +1,5 @@
 ﻿using App.Core.Interface;
+using App.Infrastructure.Cache;
 using App.Logic.BackgroundJobs;
 using App.Logic.Services;
 using App.Logic.UoW;
@@ -29,6 +30,13 @@ namespace App.Logic.Extension
             services.AddHostedService<ExpiredRefreshTokenCleanerService>();
 
             services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(builder.GetConnectionString("RedisConnection")!));
+
+            services.AddHttpContextAccessor();
+
+            services.AddMemoryCache(); // bu da lazım
+            services.AddScoped<MemoryCacheService>();
+
+
         }
     }
 }

@@ -17,6 +17,7 @@ namespace App.Logic.UoW
 
         public void Dispose()
         {
+            // Dispose resources if needed
         }
 
         public Task<int> SaveChangesAsync(CancellationToken cancellationToken)

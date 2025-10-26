@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { ChatMessage } from '../models/test/ChatMessage.model';
 import { GenericService } from './generic.service';
 
 @Injectable({
@@ -10,12 +11,16 @@ export class SendmessageService {
 
   constructor(private genericService : GenericService) { }
 
-  sendMessage(receiverUserNumber: string, content: string) {
+  sendMessage(chatMessageDto: ChatMessage) {
     const body = {
-      receiverUserNumber: receiverUserNumber,
-      content: content
+      receiverNumber: chatMessageDto.receiverNumber,
+      content: chatMessageDto.content,
+      sentAt: chatMessageDto.sentAt,
+      senderNumber: chatMessageDto.senderNumber
     };
 
     return this.genericService.post(this.endPoint, body);
   }
+
+
 }

@@ -1,4 +1,6 @@
-﻿namespace App.Logic.HubContext
+﻿using App.Core.DTOs;
+
+namespace App.Logic.HubContext
 {
     public interface IWorkerHub
     {
@@ -10,11 +12,19 @@
         /// <summary>
         /// İlgili user'ın tüm mesasage list'ini anlık olarak güncellerç
         /// </summary>
-        Task UpdateNotifyClientMessageList(string userNumber);
+        Task UpdateNotifyClientMessageList(string senderNumber, string receiverNumber);
 
         /// <summary>
         /// İlgili receiver'i belirli bir kullanıcıya mesaj gönderir.
         /// </summary>
-        Task SendMessage(string receiverNumber, string message);
+        Task ReceiveMessageAsync(ChatMessageDto chatMessageDto);
+
+        /// <summary>
+        /// İlgili kullanıcının yazıyor ya da yazmıyor ifadesini gösterir.
+        /// </summary>
+        /// <param name="senderNumber"></param>
+        /// <param name="receiverNumber"></param>
+        /// <returns></returns>
+        Task UserTyping(string senderNumber);
     }
 }

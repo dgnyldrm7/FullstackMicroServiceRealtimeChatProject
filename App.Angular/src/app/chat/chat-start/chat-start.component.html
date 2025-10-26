@@ -1,51 +1,127 @@
-<div class="h-100 d-flex flex-column mx-auto" style="background-color: #f0f2f5; width: 100%; max-width: 780px;">
+<div class="chat-wrapper d-flex flex-column bg-light rounded-3 shadow-sm">
+  <!-- 🧠 Header: Kullanıcı bilgisi + durum -->
+  <div class="chat-header p-3 d-flex align-items-center bg-white border-bottom">
+    <img
+      src="userProfileImage.jpeg"
+      class="rounded-circle me-3"
+      alt="User Image"
+      width="45"
+      height="45"
+      style="object-fit: cover; border: 2px solid #eaeaea; box-shadow: 0 1px 3px rgba(0,0,0,0.1);"
+    />
 
-  <!-- ÜST BAR: Kullanıcı bilgileri -->
-  <div class="d-flex align-items-center p-2 bg-white shadow-sm border-bottom">
-    <img src="userProfileImage.jpeg" class="rounded-circle me-2" alt="User Image" width="40" height="40" />
-    <div>
-      <div class="fw-semibold">{{ senderName }}</div>
-      <small class="text-muted">{{ aliciNumara }}</small>
+    <div class="flex-grow-1">
+      <div class="d-flex align-items-center">
+        <h6 class="mb-0 fw-semibold text-dark">{{ aliciName }}</h6>
+      </div>
+
     </div>
   </div>
 
-  <!-- MESAJLAR -->
-  <div #chatContainer class="flex-grow-1 overflow-auto px-3 py-2 d-flex flex-column">
-    @for (data of conversationData; track data) {
+  <!-- 💬 Mesaj Alanı -->
+  <div
+    #chatContainer
+    class="message-container flex-grow-1 overflow-auto p-3"
+    style="background-color: #f8f9fa;"
+  >
+    <div *ngFor="let message of conversationData; trackBy: trackByMessage" class="mb-2">
 
-      @if (data.senderNumber !== aliciNumara) {
-        <!-- Benim mesajım (sağda) -->
-        <div class="d-flex justify-content-end mb-2">
-          <div class="p-2 rounded-3 bg-success text-white shadow-sm"
-               style="max-width: 75%; word-break: break-word; overflow-wrap: break-word; white-space: pre-wrap;">
-            <small>{{ data.content }}</small><br />
-            <small class="text-light">{{ data.sentAt | date:'HH:mm' }}</small>
+      <!-- 🟦 Outgoing (benim mesajım) -->
+      <div *ngIf="message.senderNumber === currentNumber" class="d-flex justify-content-end">
+        <div
+          class="message-bubble message-outgoing bg-primary text-white px-3 py-2 rounded-3 position-relative shadow-sm"
+          style="max-width: 75%; word-wrap: break-word;"
+        >
+          <div class="message-content">{{ message.content }}</div>
+
+
+
+          <div class="d-flex align-items-center justify-content-end mt-1">
+            <span class="message-time small text-light opacity-75">{{ message.sentAt | date:'HH:mm' }}</span>
+
+            <!-- 🕒 Gönderiliyor -->
+            <i *ngIf="message.pending" class="bi bi-clock ms-2 text-light small" title="Gönderiliyor..."></i>
+
+            <!-- ❌ Hata -->
+            <i *ngIf="message.failed" class="bi bi-exclamation-circle-fill text-danger ms-2 small" title="Gönderilemedi"></i>
+
+            <!-- ✅ Gönderildi -->
+            <i *ngIf="!message.pending && !message.failed && !message.seen" class="bi bi-check-lg ms-2 small opacity-75" title="Gönderildi"></i>
+
+            <!-- ✅✅ Görüldü -->
+            <i *ngIf="message.seen" class="bi bi-check-all text-info ms-2 small" title="Görüldü"></i>
           </div>
         </div>
-      }
+      </div>
 
-      @if (data.senderNumber === aliciNumara) {
-        <!-- Diğer kişinin mesajı (solda) -->
-        <div class="d-flex justify-content-start mb-2">
-          <div class="p-2 rounded-3 shadow-sm"
-               style="max-width: 75%; background-color: #f1f0f0; word-break: break-word; white-space: pre-wrap;">
-            <small class="text-dark">{{ data.content }}</small><br />
-            <small class="text-muted">{{ data.sentAt | date:'HH:mm' }}</small>
-          </div>
+      <!-- 🟩 Incoming (karşı tarafın mesajı) -->
+      <div *ngIf="message.senderNumber === aliciNumara" class="d-flex justify-content-start">
+        <div
+          class="message-bubble message-incoming bg-white text-dark px-3 py-2 rounded-3 border position-relative shadow-sm"
+          style="max-width: 75%; word-wrap: break-word;"
+        >
+          <div class="message-content">{{ message.content }}</div>
+          <span class="message-time small text-muted d-block mt-1">{{ message.sentAt | date:'HH:mm' }}</span>
         </div>
-      }
+      </div>
+    </div>
 
-    }
+      <!-- 🔹 Yazıyor bilgisi -->
+      <div class="text-muted small mt-1 mb-2">
+        @if (statusMessage === 'Yazıyor...') {
+          <div class="typing-indicator">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+          </div>
+        }
+      </div>
+
   </div>
 
-  <!-- ALT BAR: Mesaj gönderme -->
-  <div class="p-2 border-top bg-white d-flex align-items-center">
-    <input type="text" [(ngModel)]="userInputMessage"
-           (keydown.enter)="sendMessage()"
-           class="form-control me-2 rounded-pill"
-           placeholder="Mesajınızı yazın..." />
-    <button class="btn btn-primary rounded-circle" (click)="sendMessage()">
-      <i class="bi bi-send-fill"></i>
+  <!-- ✍️ Mesaj Giriş Alanı -->
+  <div class="input-area d-flex align-items-center gap-2 p-2 bg-white border-top">
+    <!-- Attachment -->
+    <button
+      class="btn btn-light rounded-circle"
+      style="opacity: 0.5;"
+      disabled
+      title="Dosya ekle (yakında)"
+    >
+      <i class="bi bi-paperclip"></i>
+    </button>
+
+    <!-- Input -->
+    <div class="flex-grow-1 position-relative">
+      <input
+        type="text"
+        [(ngModel)]="userInputMessage"
+        (keydown.enter)="sendMessage()"
+        (input)="onTyping()"
+        class="form-control chat-input rounded-pill px-3 py-2"
+        placeholder="Mesajınızı yazın..."
+        autocomplete="off"
+      />
+    </div>
+
+    <!-- Emoji -->
+    <button
+      class="btn btn-light rounded-circle"
+      style="opacity: 0.5;"
+      disabled
+      title="Emoji ekle (yakında)"
+    >
+      <i class="bi bi-emoji-smile"></i>
+    </button>
+
+    <!-- Gönder -->
+    <button
+      class="btn send-button rounded-circle bg-primary d-flex align-items-center justify-content-center"
+      (click)="sendMessage()"
+      [disabled]="!userInputMessage || userInputMessage.trim() === ''"
+      style="width: 42px; height: 42px;"
+    >
+      <i class="bi bi-send-fill text-white"></i>
     </button>
   </div>
 </div>

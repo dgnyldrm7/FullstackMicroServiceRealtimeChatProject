@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core'; // 🔹 OnInit eklendi
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ChatMessage } from '../../models/test/ChatMessage.model';
 import { User } from '../../models/test/user.model';
 import { GetmeService } from '../../services/getme.service';
 import { LogoutService } from '../../services/logout.service';
@@ -13,10 +14,9 @@ import { SendmessageService } from '../../services/sendmessage.service';
   styleUrls: ['./chat-new.component.css'],
   imports: [CommonModule, FormsModule]
 })
-export class ChatNewComponent {
+export class ChatNewComponent implements OnInit {   // 🔹 implements OnInit eklendi
 
-  errorMessage: string = ""; // Hata mesajı için değişken
-
+  errorMessage: string = "";
   @ViewChild('closeModalButton') closeModalButton: ElementRef;
 
   showUser : User = {
@@ -24,68 +24,81 @@ export class ChatNewComponent {
     userName: "",
     email: "",
     phoneNumber: ""
+  };
+
+  userNumber : string;
+  isLoading: boolean = false;
+  targetNumber: string = "";
+  messageContent: string = "";
+
+  constructor(
+    private getMe: GetmeService,
+    private logoutService: LogoutService,
+    private router: Router,
+    private messageService : SendmessageService
+  ) { }
+
+  ngOnInit(): void {                      // ✅ Kullanıcı bilgisi component açıldığında alınır
+    this.getUserInfo();
   }
-
-  userNumber : string; // Kullanici numarasi tutmak icin!
-
-  isLoading: boolean = false;  // Loading durumunu kontrol etmek için
-
-  targetNumber: string = ""; // Hedef numara
-  messageContent: string = ""; // Mesaj içeriği
-
-  constructor(private getMe: GetmeService, private logoutService: LogoutService, private router: Router, private messageService : SendmessageService) { }
 
   newMessage() {
     this.errorMessage = "";
+
+    if (!this.userNumber) {
+      this.errorMessage = "Kullanıcı numarası yüklenemedi. Lütfen tekrar deneyin.";
+      return;
+    }
+
     if (!this.messageContent || this.messageContent.trim() === "") {
       this.errorMessage = "Mesaj içeriği boş olamaz.";
       return;
     }
-    this.messageService.sendMessage(this.targetNumber, this.messageContent).subscribe({
-      next: (response) => {
 
-        this.closeModalButton.nativeElement.click(); // ✅ Modal'ı kapat
+    const chatMessageDto: ChatMessage = {
+      senderNumber: this.userNumber,
+      receiverNumber: this.targetNumber,
+      content: this.messageContent,
+      sentAt: new Date()
+    };
 
-        // Alanları temizle
+    this.messageService.sendMessage(chatMessageDto).subscribe({
+      next: () => {
+        this.closeModalButton.nativeElement.click();
         this.targetNumber = "";
         this.messageContent = "";
       },
       error: (error) => {
         console.error("Mesaj gönderimi başarısız oldu: ", error);
         this.errorMessage = "Mesaj gönderilirken bir hata oluştu. Lütfen tekrar deneyin.";
-      },
-      complete: () => {
       }
     });
   }
 
-
-
   getUserInfo() {
-    this.getMe.getMe().subscribe((response) => {
-      this.userNumber = response.data.phoneNumber;
-      this.showUser = response.data;
+    this.getMe.getMe().subscribe({
+      next: (response) => {
+        this.userNumber = response.data.phoneNumber;   // ✅ Artık burada set edilecek
+        this.showUser = response.data;
+      },
+      error: (err) => {
+        console.error("Kullanıcı bilgisi alınamadı:", err);
+        this.errorMessage = "Kullanıcı bilgisi alınamadı. Lütfen giriş yapın.";
+      }
     });
   }
 
   logOut() {
     this.isLoading = true;
-    this.getUserInfo();
-    // 1 saniye bekle, ardından logout işlemini başlat
     setTimeout(() => {
       this.logoutService.logout().subscribe({
-        next: (response) => {
-          this.router.navigate(['/login']);
-        },
+        next: () => this.router.navigate(['/login']),
         error: (error) => {
-          console.error("Logout failed, çözümlenilemeyen hata! ", error);
+          console.error("Logout failed: ", error);
           this.isLoading = false;
         },
-        complete: () => {
-          this.isLoading = false;
-        }
+        complete: () => this.isLoading = false
       });
     }, 1000);
   }
-
 }

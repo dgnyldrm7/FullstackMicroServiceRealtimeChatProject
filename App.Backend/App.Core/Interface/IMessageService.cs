@@ -6,6 +6,6 @@ namespace App.Core.Interface
 {
     public interface IMessageService
     {
-        Task<Result<MessageDto>> SendMessageAsync(SendMessageDto sendMessageDto);
+        Task<Result<MessageDto>> SendMessageAsync(ChatMessageDto dto);
     }
 }

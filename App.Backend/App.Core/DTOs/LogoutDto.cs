@@ -2,7 +2,7 @@
 {
     public class LogoutDto
     {
-        public string RefreshToken { get; set; } = default!;
+        public string? RefreshToken { get; set; }
         public string UserNumber { get; set; } = default!;
     }
 }

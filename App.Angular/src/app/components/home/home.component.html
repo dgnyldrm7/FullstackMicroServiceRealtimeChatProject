@@ -16,12 +16,9 @@
       <app-chat-start
         *ngIf="isSelected"
         [conversationData]="selectedConversationData"
-        [currentUserId]="currentUserId"
-        [senderNumber]="messageContext.friendNumber"
         [aliciNumara]="messageContext.friendNumber"
         [aliciUserId]="messageContext.receiverId"
-        [benimnumaram]="messageContext.friendNumber"
-        [senderName]="friendName">
+        [aliciName]="friendName">
       </app-chat-start>
     </div>
   </div>

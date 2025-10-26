@@ -22,6 +22,8 @@ export class LoginComponent {
   public isRegistering: boolean = false;
   public successMessage: string = '';
   public errorMessage: string = '';
+  public errorMessageForLogin: string = '';
+  public isSuccessForLogin: boolean = false;
   public isSuccess: boolean = false;
   public isRegisterSuccess: boolean = false;
 
@@ -35,13 +37,28 @@ export class LoginComponent {
       .subscribe({
         next: (response) => {
           this.isLoading = false;
-          this.isSuccess = false;
+          this.isSuccessForLogin = true;
           this.router.navigate(['/']);
         },
+        /*
         error: (error) => {
           this.isLoading = false;
-          this.isSuccess = true;
-          console.error('Login failed!', error);
+          this.isSuccessForLogin = false;
+
+          this.errorMessageForLogin = error.error.errorMessage || 'Giriş işlemi sırasında bir hata oluştu.';
+        }
+          */
+        error: (error) => {
+          this.isLoading = false;
+          const errorData = error.error;
+          if (errorData?.errors) {
+            for (const err of errorData.errors) {
+              this.validationErrors[err.field] = err.errors;
+            }
+            this.errorMessageForLogin = 'Lütfen tüm alanları doğru bir şekilde doldurduğunuzdan emin olun.';
+          } else {
+            this.errorMessageForLogin = error.error.errorMessage || 'Kayıt işlemi sırasında bir hata oluştu.';
+          }
         }
       });
   }
@@ -80,7 +97,7 @@ export class LoginComponent {
             }
             this.errorMessage = 'Lütfen tüm alanları doğru bir şekilde doldurduğunuzdan emin olun.';
           } else {
-            this.errorMessage = error.message?.errorMessage || 'Kayıt işlemi sırasında bir hata oluştu.';
+            this.errorMessage = error.error.errorMessage || 'Kayıt işlemi sırasında bir hata oluştu.';
           }
         }
       });

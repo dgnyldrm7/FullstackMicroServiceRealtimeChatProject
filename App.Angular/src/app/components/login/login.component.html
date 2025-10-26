@@ -5,12 +5,13 @@
     <!-- Giriş Formu -->
     <form *ngIf="!isRegistering" (ngSubmit)="LoginMethod()">
       <!-- Hata mesajı -->
-      <div *ngIf="isSuccess" class="alert alert-danger" role="alert">
-        Hatalı giriş yaptınız.
+      <div *ngIf="!isSuccessForLogin && errorMessageForLogin" class="alert alert-danger" role="alert">
+        {{ errorMessageForLogin }}
       </div>
+
       <div class="mb-3">
         <label for="phoneNumber" class="form-label">Numara</label>
-        <input type="text" class="form-control" id="phoneNumber" placeholder="0533 333 33 33"
+        <input type="text" class="form-control" id="phoneNumber" placeholder="05333333333"
                [(ngModel)]="phoneNumber" name="phoneNumber">
       </div>
 

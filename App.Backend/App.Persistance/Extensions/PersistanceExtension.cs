@@ -13,6 +13,14 @@ namespace App.Persistance.Extensions
         {
             services.AddDbContext<AppDbContext>(options =>
             {
+                /*
+                options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"), sqlOptions =>
+                {
+                    //sqlOptions.MigrationsAssembly("App.Persistance"); Or you can choose!;
+                    sqlOptions.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName);
+                });
+                */
+
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), sqlOptions =>
                 {
                     //sqlOptions.MigrationsAssembly("App.Persistance"); Or you can choose!;

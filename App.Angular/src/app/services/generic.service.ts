@@ -8,7 +8,7 @@ export class GenericService {
 
   //https://localhost:7281/api/auth/login     https://fahrigedik.shop/api
 
-  private baseUrl : string = "https://fahrigedik.shop/api";
+  private baseUrl : string = "https://localhost:7281/api";
 
   constructor(private http : HttpClient) { }
 
